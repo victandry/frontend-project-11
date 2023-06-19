@@ -2,6 +2,7 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/victandry/frontend-project-11/workflows/hexlet-check/badge.svg)](https://github.com/victandry/frontend-project-11/actions)",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -31,9 +32,12 @@
   },
   "dependencies": {
     "bootstrap": "^5.2.3",
+    "i18next": "^22.5.0",
     "npm-check-updates": "^16.6.2",
+    "on-change": "^4.0.2",
     "sass": "^1.57.1",
-    "sass-loader": "^13.2.0"
+    "sass-loader": "^13.2.0",
+    "yup": "^1.2.0"
   },
   "repository": {
     "type": "git",
