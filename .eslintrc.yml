@@ -9,7 +9,7 @@ env:
   jest: true
   browser: true
 
-parserOptions:
+parser:
   ecmaVersion: 2020
 
 extends:
