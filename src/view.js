@@ -1,86 +1,99 @@
 import onChange from 'on-change';
 
-export default (elements) => {
+export default (elements, i18n, state) => {
   const renderForm = () => {
-    const rssHeading = document.createElement('h1');
-    rssHeading.classList.add('display-3', 'mb-0');
-    rssHeading.textContent = 'RSS агрегатор'; // замена на i18n.t(...)
+    const rssHeading = elements.rssInput.querySelector('h1');
+    rssHeading.textContent = i18n.t('heading'); // замена на i18n.t(...)
 
-    const rssPEl = document.createElement('p');
-    rssPEl.classList.add('lead');
-    rssPEl.textContent = 'Начните читать RSS сегодня! Это легко, это красиво.'; // замена на i18n.t(...)
+    const rssPEl = elements.rssInput.querySelector('.lead');
+    rssPEl.textContent = i18n.t('subHeading'); // замена на i18n.t(...)
 
-    const form = document.createElement('form');
-    form.classList.add('rss-form', 'text-body');
+    const urlInput = elements.rssInput.querySelector('#url-input');
+    urlInput.setAttribute('placeholder', i18n.t('inputRssFieldName')); // замена на i18n.t(...)
 
-    const formDivElRow = document.createElement('div');
-    formDivElRow.classList.add('row');
+    const labelUrlInput = urlInput.nextElementSibling;
+    labelUrlInput.textContent = i18n.t('inputRssFieldName'); // замена на i18n.t(...)
 
-    const formDivElCol = document.createElement('div');
-    formDivElCol.classList.add('col');
+    const submitButton = elements.form.querySelector('button');
+    submitButton.textContent = i18n.t('submitButton'); // замена на i18n.t(...)
 
-    const formDivElFloat = document.createElement('div');
-    formDivElFloat.classList.add('form-floating');
-
-    const inputField = document.createElement('input');
-    inputField.classList.add('form-control', 'w-100');
-    inputField.id = 'url-input';
-    inputField.name = 'url';
-    inputField.setAttribute('aria-label', 'url');
-    inputField.setAttribute('placeholder', 'ссылка RSS'); // замена на i18n.t(...)
-    inputField.setAttribute('autocomplete', 'off');
-    inputField.setAttribute('autofocus', '');
-    inputField.setAttribute('required', '');
-
-    const inputLabel = document.createElement('label');
-    inputLabel.for = 'url-input';
-    inputLabel.textContent = 'Ссылка URL'; // замена на i18n.t(...)
-
-    formDivElFloat.append(inputField);
-    formDivElFloat.append(inputLabel);
-    formDivElCol.append(formDivElFloat);
-
-    const submitButtonDiv = document.createElement('div');
-    submitButtonDiv.classList.add('col-auto');
-
-    const submitButton = document.createElement('button');
-    submitButton.classList.add('h-100', 'btn', 'btn-lg', 'btn-primary', 'px-sm-5');
-    submitButton.type = 'submit';
-    submitButton.setAttribute('aria-label', 'add');
-    submitButton.textContent = 'Добавить'; // замена на i18n.t(...)
-
-    submitButtonDiv.append(submitButton);
-    formDivElRow.append(formDivElCol); 
-    formDivElRow.append(submitButtonDiv);
-    form.append(formDivElRow);
-
-    elements.rssInput.append(rssHeading);
-    elements.rssInput.append(rssPEl);
-    elements.rssInput.append(form);
-
-    const rssExampleEl = document.createElement('p');
-    rssExampleEl.classList.add('mt-2', 'mb-0', 'text-muted');
-    rssExampleEl.textContent = 'Пример: https://ru.hexlet.io/lessons.rss';
-    elements.rssInput.append(rssExampleEl);
+    const exampleEl = elements.form.nextElementSibling;
+    exampleEl.textContent = i18n.t('example'); // замена на i18n.t(...)
   };
 
-  /* const watchedState = onChange(state, (path) => {
+  const handleErrors = () => {
+    const errEl = document.createElement('p');
+    errEl.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-danger');
+    errEl.textContent = state.form.errors;
+    if (errEl.textContent) {
+      const divTextWhite = elements.form.parentElement;
+      divTextWhite.append(errEl);
+
+      const formInput = document.querySelector('#url-input');
+      formInput.classList.add('is-invalid');
+    }
+
+    /* const formFields = Object.keys(fields);
+    formFields.forEach((item) => {
+      if (!state.form.errors[item]) {
+        fields[item].classList.remove('is-invalid');
+        fields[item].classList.add('is-valid');
+      } else {
+        fields[item].classList.add('is-invalid');
+        fields[item].classList.remove('is-valid');
+        const itemErrors = state.form.errors[item];
+        itemErrors.forEach((error) => {
+          errorFields[item].textContent = i18n.t(error.key, error.values);
+        });
+      }
+    }); */
+  }
+
+  const clearMessage = () => {
+    const messageEl = document.querySelector('.text-danger') ?? document.querySelector('.text-success');
+    if (messageEl) {
+      if (messageEl.parentNode) {
+        messageEl.parentElement.removeChild(messageEl);
+      }
+    }
+
+    const formInput = document.querySelector('#url-input');
+    formInput.classList.remove('is-invalid');
+  }
+
+  const displaySuccessMessage = () => {
+    const successEl = document.createElement('p');
+    successEl.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-success');
+    successEl.textContent = i18n.t('successMessage');
+
+    const divTextWhite = elements.form.parentElement;
+    divTextWhite.append(successEl);
+    elements.form.reset();
+
+    const rssInput = document.getElementById('url-input');
+    rssInput.focus();
+  }
+
+  const watchedState = onChange(state, (path) => {
     switch(path) {
       case 'form.status':
         renderForm();
         // getFormElements();
         break;
       case 'form.errors':
+        clearMessage();
         handleErrors();
         break;
       case 'form.valid':
-        clearErrors();
+        if (state.form.valid === true) {
+          clearMessage();
+          displaySuccessMessage();
+        }
         break; 
       default:
        break;
     } 
-  }); */
+  });
 
-  renderForm();
-  // return watchedState;
+  return watchedState;
 };
