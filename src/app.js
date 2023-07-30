@@ -43,7 +43,7 @@ export default () => {
     .notOneOf(state.feeds.map(({ url }) => url), i18n.t('errors.rssExists')),
   });
 
-  elements.form.addEventListener('submit', async (e) => {
+  elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const newRss = Object.fromEntries(formData);
