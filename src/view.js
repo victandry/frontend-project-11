@@ -76,16 +76,16 @@ export default (elements, i18n, state) => {
 
   const watchedState = onChange(state, (path) => {
     switch(path) {
-      case 'form.status':
+      case 'rssForm.status':
         renderForm();
         // getFormElements();
         break;
-      case 'form.errors':
+      case 'rssForm.errors':
         clearMessage();
         handleErrors();
         break;
-      case 'form.valid':
-        if (state.form.valid === true) {
+      case 'rssForm.valid':
+        if (state.rssForm.valid === true) {
           clearMessage();
           displaySuccessMessage();
         }
