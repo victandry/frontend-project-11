@@ -20,7 +20,7 @@ export default () => {
       valid: false,
       errors: [],
     },
-    feeds: [{url: 'https://ru.hexlet.io/lessons.rss'}],
+    feeds: [],
   };
 
   yup.setLocale({
@@ -46,19 +46,22 @@ export default () => {
   const watchedState = watch(elements, i18n, state);
   watchedState.rssForm.status = 'filling';
 
-  let schema = yup.object().shape({
-    url: yup.string()
-    .required()
-    .url()
-    .notOneOf(state.feeds.map(({ url }) => url))
-  });
-
+  const createSchema = (feeds) => {
+    let schema = yup.object().shape({
+      url: yup.string()
+      .required()
+      .url()
+      .notOneOf(feeds.map(({ url }) => url))
+    });
+    return schema;
+  };
+  
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const newRss = Object.fromEntries(formData);
 
-    schema
+    createSchema(state.feeds)
       .validate(newRss, { abortEarly: false })
       .then(function(value) {
         console.log('state.feeds', state.feeds, 'value.url', value.url);
