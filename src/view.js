@@ -24,7 +24,8 @@ export default (elements, i18n, state) => {
   const handleErrors = () => {
     const errEl = document.createElement('p');
     errEl.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-danger');
-    errEl.textContent = state.form.errors;
+    const [errorKey] = state.rssForm.errors;
+    errEl.textContent = i18n.t(errorKey);
     if (errEl.textContent) {
       const divTextWhite = elements.form.parentElement;
       divTextWhite.append(errEl);
@@ -65,6 +66,7 @@ export default (elements, i18n, state) => {
     const successEl = document.createElement('p');
     successEl.classList.add('feedback', 'm-0', 'position-absolute', 'small', 'text-success');
     successEl.textContent = i18n.t('successMessage');
+    console.log(successEl.textContent);
 
     const divTextWhite = elements.form.parentElement;
     divTextWhite.append(successEl);
