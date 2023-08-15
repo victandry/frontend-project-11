@@ -86,7 +86,42 @@ export default () => {
     });
     watchedState.feedItems = [...state.feedItems, ...newItemEntries];
   }
-  
+
+  const updateFeeds = (url) => {
+    axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`)
+    .then((response) => { 
+      console.log('response', response);
+      return { contents: response.data.contents, url };
+    })
+    .then(({ contents, url }) => [new window.DOMParser().parseFromString(contents, "text/xml"), url])
+    .then(([data, url]) => {
+      const feedsNewItems = data.querySelectorAll("item"); // новые посты
+      const feedId = state.feeds // найдём id фида
+        .filter((feed) => feed.url === url)
+        .map((feed) => feed.id);
+      const feedsOldItems = state.feedItems // вычленим из всех постов посты с id фида
+        .filter((feedItem) => feedItem.feedId === feedId);
+      if (feedsNewItems.length > feedsOldItems.length) { // если количество новых постов по фиду больше старых (значит появились новые посты и их надо отобразить)
+        const feedOldItemsIds = feedsOldItems // найдём id старых постов
+          .map(({ id }) => id);
+        const updatedItems = [];
+        feedsNewItems.forEach((item) => {
+          const itemEntry = {};
+          itemEntry.id = item.querySelector("guid").textContent;
+          itemEntry.feedId = feedId;
+          itemEntry.title = item.querySelector("title").textContent;
+          itemEntry.link = item.querySelector("link").textContent;
+          itemEntry.description = item.querySelector("description").textContent;
+          updatedItems.push(itemEntry);
+        });
+        const newItems = updatedItems.filter((item) => feedOldItemsIds.indexOf(item.id) === -1); // нашли новые посты
+        watchedState.feedItems = [...state.feedItems, ...newItems]; // обновили состояние новыми постами, чтобы отрендерить обновлённый список
+      }
+      return url;
+    })
+    .then((url) => setTimeout(() => updateFeeds(url), 5000));
+  }
+
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
@@ -98,7 +133,6 @@ export default () => {
         console.log('state.feeds', state.feeds, 'value.url', value.url);
         watchedState.rssForm.errors = [];
         const { url } = value;
-        // state.feeds.push(value);
         watchedState.rssForm.valid = true;
         watchedState.rssForm.valid = '';
         return url;
@@ -110,13 +144,11 @@ export default () => {
       })
       .then(({ contents, url }) => [new window.DOMParser().parseFromString(contents, "text/xml"), url])
       .then(([data, url]) => {
-        console.log('data', data);
-        console.log('initial url', url);
         const feedId = formFeed(data, url);
-        console.log(state.feeds);
         formFeedItems(data, feedId);
-        console.log(state.feedItems);
+        return url;
       })
+      .then((url) => setTimeout(() => updateFeeds(url), 5000))
       .catch((err) => {
         // console.log(`An error [${err.inner.map(({message}) => message.key)}] has occured, figure it out!`);
         console.log(`An error ${err} has occured, figure it out!`);
